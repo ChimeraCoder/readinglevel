@@ -8,9 +8,17 @@ import (
 )
 
 
-type Corpus map[string][]string
+// A Corpus is a body of text that supports certain features
+// Currently the only required queries are Syllables (number of syllables)
+// and Words (number of words)
+type Corpus interface {
+    Syllables(string) int
+    Words() int
+}
 
-var cmuCorpus = Corpus(map[string][]string{})
+type cmuCorpus map[string][]string
+
+var cmuCorpusCached cmuCorpus = map[string][]string{}
 
 func loadCMUCorpus() error{
     bts, err := ioutil.ReadFile("cmudict.corpus")
@@ -33,7 +41,7 @@ func loadCMUCorpus() error{
 
         linesplit := strings.Split(line, " ")
         word := linesplit[0]
-        cmuCorpus[strings.ToUpper(word)] = linesplit[1:]
+        cmuCorpusCached[strings.ToUpper(word)] = linesplit[1:]
     }
 
     return nil
@@ -42,7 +50,7 @@ func loadCMUCorpus() error{
 
 // Syllables returns the number of syllables for the word, according to the corpus
 // If the word is not in the corpus, it will return 0
-func (c Corpus) Syllables(word string) int {
+func (c cmuCorpus) Syllables(word string) int {
     phonemes, ok := c[strings.ToUpper(word)]
     if !ok {
         return 0
@@ -57,4 +65,8 @@ func (c Corpus) Syllables(word string) int {
         }
     }
     return count
+}
+
+func (c cmuCorpus) Words() int{
+    return len(c)
 }

@@ -12,8 +12,8 @@ func Test_CMUDict(t *testing.T) {
     }
 
     const expectedLength = 133265
-    if len(cmuCorpus) != expectedLength {
-        t.Errorf("Expected %d words in corpus and found %d", expectedLength, len(cmuCorpus))
+    if cmuCorpusCached.Words() != expectedLength {
+        t.Errorf("Expected %d words in corpus and found %d", expectedLength, cmuCorpusCached.Words())
     }
 }
 
@@ -36,7 +36,7 @@ func Test_CMUSyllables(t *testing.T){
     }
 
     for word, expected := range TestWords {
-        if syllables := cmuCorpus.Syllables(word); syllables != expected {
+        if syllables := cmuCorpusCached.Syllables(word); syllables != expected {
             t.Errorf("expected %d syllables for \"%s\" and received %d", expected, word, syllables)
         }
     }
