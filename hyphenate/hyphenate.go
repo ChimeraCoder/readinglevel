@@ -19,26 +19,17 @@ type cmuCorpus map[string][]string
 
 var cmuCorpusCached cmuCorpus = map[string][]string{}
 
-// Return the CMUCorpus, reading it from a file if it has not already been loaded
-// The corpus is cached in memory, so the error value only needs to be checked the first time it is called
+// CMUCorpus returns the CMU corpus
 func CMUCorpus() (Corpus, error) {
-	if cmuCorpusCached == nil {
-		if err := loadCMUCorpus(); err != nil {
-			return nil, err
-		}
-	}
-	return cmuCorpusCached, nil
-}
-
-func loadCMUCorpus() error {
 	bts, err := ioutil.ReadFile("cmudict.corpus")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cmu := string(bts)
 
 	re := regexp.MustCompile(`^[A-Z]`)
+	var tmpCorpus cmuCorpus = map[string][]string{}
 	for _, line := range strings.Split(cmu, "\n") {
 		line = strings.TrimSpace(line)
 
@@ -51,10 +42,10 @@ func loadCMUCorpus() error {
 
 		linesplit := strings.Split(line, " ")
 		word := linesplit[0]
-		cmuCorpusCached[strings.ToUpper(word)] = linesplit[1:]
+		tmpCorpus[strings.ToUpper(word)] = linesplit[1:]
 	}
 
-	return nil
+	return tmpCorpus, nil
 }
 
 // Syllables returns the number of syllables for the word, according to the corpus
