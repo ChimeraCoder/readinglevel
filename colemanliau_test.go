@@ -18,7 +18,7 @@ func Test_NumWords(t *testing.T) {
 }
 
 func Test_NumSentences(t *testing.T) {
-	const expected = 12
+	const expected = 11
 	const tolerance float64 = 0
 	if n := NumSentences(SherlockHolmes); math.Abs(float64(n-expected)) > tolerance {
 		t.Errorf("Expected %d sentences and counted %d", expected, n)
