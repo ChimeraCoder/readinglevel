@@ -1,6 +1,8 @@
 package readinglevel
 
 import (
+	"github.com/ChimeraCoder/textcorpora/cmu"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -36,4 +38,47 @@ func ColemanLiau(corpus string) float64 {
 	S := float64(NumSentences(corpus)) / float64(100*NumWords(corpus))
 
 	return 0.0588*L - 0.296*S - 15.8
+}
+
+func NumSyllables(text string) (int, error) {
+	text = whitespaceRe.ReplaceAllLiteralString(text, " ")
+	text = strings.TrimSpace(text)
+	words := strings.Split(text, " ")
+
+	var syllables int
+	var notFound int
+
+	corpus, err := cmu.CMUCorpus()
+	if err != nil {
+		return 0, err
+	}
+	for _, word := range words {
+		// TODO check for words in which the lookup failed
+		s := corpus.Syllables(word)
+		syllables += s
+
+		if s == 0 {
+			notFound++
+		}
+		//log.Print(word)
+		//log.Print(corpus.Syllables(word))
+	}
+	log.Printf("Missed %d of %d", notFound, len(words))
+	return syllables, nil
+}
+
+// FleschKincaid returns the grade level of the given body of text
+// according to the Flesch-Kincaid grade level test
+// It currently underestimates the grade level slightly, as unknown words
+// are treated as having 0 syllables
+func FleschKincaid(corpus string) (float64, error) {
+	words := NumWords(corpus)
+	sentences := NumSentences(corpus)
+	syllables, err := NumSyllables(corpus)
+	if err != nil {
+		return 0, err
+	}
+	wordsPerSentence := float64(words) / float64(sentences)
+	syllablesPerWord := float64(syllables) / float64(words)
+	return .39*wordsPerSentence + 11.8*syllablesPerWord - 15.59, nil
 }
