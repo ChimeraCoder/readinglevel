@@ -26,7 +26,7 @@ func NumSentences(corpus string) int {
 	re := regexp.MustCompile(`\s+`)
 	corpus = re.ReplaceAllLiteralString(corpus, " ")
 	corpus = strings.TrimSpace(corpus)
-	return len(strings.Split(corpus, "."))
+	return len(strings.Split(corpus, ".")) - 1 // Subtract one, assuming the last character is a period
 }
 
 func ColemanLiau(corpus string) float64 {
