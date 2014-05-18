@@ -3,6 +3,8 @@ package readinglevel
 import (
 	"github.com/ChimeraCoder/textcorpora"
 	"github.com/ChimeraCoder/textcorpora/cmu"
+	"log"
+	"math"
 	"regexp"
 	"strings"
 )
@@ -79,6 +81,26 @@ func NumComplexWords(text string) (int, error) {
 	return complexWords, nil
 }
 
+func polysyllableCount(text string) (int, error) {
+	text = whitespaceRe.ReplaceAllLiteralString(text, " ")
+	text = strings.TrimSpace(text)
+	words := strings.Split(text, " ")
+
+	var polysyllablicWords int
+
+	corpus, err := cmu.CMUCorpus()
+	if err != nil {
+		return 0, err
+	}
+	for _, word := range words {
+		// TODO check for words in which the lookup failed
+		if corpus.Syllables(word) > 2 {
+			polysyllablicWords++
+		}
+	}
+	return polysyllablicWords, nil
+}
+
 func isComplex(word string, corpus textcorpora.Corpus) bool {
 	CommonSuffixes := regexp.MustCompile(`\w*(ed|es|ing)`)
 
@@ -134,4 +156,16 @@ func GunningFog(corpus string) (float64, error) {
 	sentences := NumSentences(corpus)
 	wordsPerSentence := float64(words) / float64(sentences)
 	return .4 * (wordsPerSentence + 100*(float64(complexWords)/float64(words))), nil
+}
+
+// SMOG returns the readability score according to SMOG (Simple Measure of Gobbledygook
+func SMOG(corpus string) (float64, error) {
+	poly, err := polysyllableCount(corpus)
+	if err != nil {
+		return 0, err
+	}
+	sentences := NumSentences(corpus)
+	log.Print(poly)
+
+	return 3.1291 + 1.0430*math.Sqrt(30*float64(poly)/float64(sentences)), nil
 }
