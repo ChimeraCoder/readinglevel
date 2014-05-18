@@ -78,3 +78,19 @@ func FleschKincaidGrade(corpus string) (float64, error) {
 	syllablesPerWord := float64(syllables) / float64(words)
 	return .39*wordsPerSentence + 11.8*syllablesPerWord - 15.59, nil
 }
+
+// FleschKincaidEase returns the reading ease score of the given body of text
+// according to the Flesch-Kincaid reading ease test
+// It overestimates the reading ease score slightly, as unknown words
+// are treated as having 0 syllables
+func FleschKincaidEase(corpus string) (float64, error) {
+	words := NumWords(corpus)
+	sentences := NumSentences(corpus)
+	syllables, err := NumSyllables(corpus)
+	if err != nil {
+		return 0, err
+	}
+	wordsPerSentence := float64(words) / float64(sentences)
+	syllablesPerWord := float64(syllables) / float64(words)
+	return 206.835 - 1.015*(wordsPerSentence) - 84.6*syllablesPerWord, nil
+}

@@ -1,7 +1,6 @@
 package readinglevel
 
 import (
-	"log"
 	"math"
 	"testing"
 )
@@ -39,6 +38,4 @@ func Test_ColemanLiau(t *testing.T) {
 	if n := ColemanLiau(SherlockHolmes); math.Abs(float64(n-expected)) > tolerance {
 		t.Errorf("Expected %f reading level and calculated %f", expected, n)
 	}
-	log.Printf("%f", ColemanLiau(SherlockHolmes))
-
 }
