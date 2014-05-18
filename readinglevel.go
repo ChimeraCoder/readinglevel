@@ -27,15 +27,13 @@ func NumWords(corpus string) int {
 func NumCharacters(corpus string) int {
 	corpus = whitespaceRe.ReplaceAllLiteralString(corpus, " ")
 	corpus = strings.TrimSpace(corpus)
-    words := strings.Split(corpus, " ")
-    count := 0
-    for _, word := range words {
-        count += len(word)
-    }
-    return count
+	words := strings.Split(corpus, " ")
+	count := 0
+	for _, word := range words {
+		count += len(word)
+	}
+	return count
 }
-
-
 
 func NumSentences(corpus string) int {
 	//TODO replace with a more sophisticated means of separation
@@ -180,11 +178,10 @@ func SMOG(corpus string) (float64, error) {
 	return 3.1291 + 1.0430*math.Sqrt(30*float64(poly)/float64(sentences)), nil
 }
 
-
 // ARI returns the readability score according to the Automated Readability Index
 func ARI(corpus string) float64 {
-    words := NumWords(corpus)
-    characters := NumCharacters(corpus)
-    sentences := NumSentences(corpus)
-    return 4.71 * float64(characters)/float64(words) + .5 * float64(words)/float64(sentences) - 21.43
+	words := NumWords(corpus)
+	characters := NumCharacters(corpus)
+	sentences := NumSentences(corpus)
+	return 4.71*float64(characters)/float64(words) + .5*float64(words)/float64(sentences) - 21.43
 }
