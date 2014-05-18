@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-func Test_FleschKincaid(t *testing.T) {
+func Test_FleschKincaidGrade(t *testing.T) {
 	const expected float64 = 9.2
 	const tolerance float64 = .05
-	grade, err := FleschKincaid(SherlockHolmes)
+	grade, err := FleschKincaidGrade(SherlockHolmes)
 	if err != nil {
 		t.Errorf("Error loading corpus for syllable detection: %s", err)
 	}

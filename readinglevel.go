@@ -2,7 +2,6 @@ package readinglevel
 
 import (
 	"github.com/ChimeraCoder/textcorpora/cmu"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -60,18 +59,15 @@ func NumSyllables(text string) (int, error) {
 		if s == 0 {
 			notFound++
 		}
-		//log.Print(word)
-		//log.Print(corpus.Syllables(word))
 	}
-	log.Printf("Missed %d of %d", notFound, len(words))
 	return syllables, nil
 }
 
-// FleschKincaid returns the grade level of the given body of text
+// FleschKincaidGrade returns the grade level of the given body of text
 // according to the Flesch-Kincaid grade level test
-// It currently underestimates the grade level slightly, as unknown words
+// It underestimates the grade level slightly, as unknown words
 // are treated as having 0 syllables
-func FleschKincaid(corpus string) (float64, error) {
+func FleschKincaidGrade(corpus string) (float64, error) {
 	words := NumWords(corpus)
 	sentences := NumSentences(corpus)
 	syllables, err := NumSyllables(corpus)
