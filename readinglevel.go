@@ -1,6 +1,7 @@
 package readinglevel
 
 import (
+	"github.com/ChimeraCoder/textcorpora"
 	"github.com/ChimeraCoder/textcorpora/cmu"
 	"regexp"
 	"strings"
@@ -45,7 +46,6 @@ func NumSyllables(text string) (int, error) {
 	words := strings.Split(text, " ")
 
 	var syllables int
-	var notFound int
 
 	corpus, err := cmu.CMUCorpus()
 	if err != nil {
@@ -55,12 +55,41 @@ func NumSyllables(text string) (int, error) {
 		// TODO check for words in which the lookup failed
 		s := corpus.Syllables(word)
 		syllables += s
-
-		if s == 0 {
-			notFound++
-		}
 	}
 	return syllables, nil
+}
+
+func NumComplexWords(text string) (int, error) {
+	text = whitespaceRe.ReplaceAllLiteralString(text, " ")
+	text = strings.TrimSpace(text)
+	words := strings.Split(text, " ")
+
+	var complexWords int
+
+	corpus, err := cmu.CMUCorpus()
+	if err != nil {
+		return 0, err
+	}
+	for _, word := range words {
+		// TODO check for words in which the lookup failed
+		if isComplex(word, corpus) {
+			complexWords++
+		}
+	}
+	return complexWords, nil
+}
+
+func isComplex(word string, corpus textcorpora.Corpus) bool {
+	CommonSuffixes := regexp.MustCompile(`\w*(ed|es|ing)`)
+
+	// No need to check error, as the corpus has already been loaded into memory by this point
+	syllables := corpus.Syllables(word)
+
+	// TODO exclude proper nounds and "familiar jargon"
+	if syllables >= 3 && CommonSuffixes.MatchString(word) {
+		syllables--
+	}
+	return syllables >= 3
 }
 
 // FleschKincaidGrade returns the grade level of the given body of text
@@ -93,4 +122,16 @@ func FleschKincaidEase(corpus string) (float64, error) {
 	wordsPerSentence := float64(words) / float64(sentences)
 	syllablesPerWord := float64(syllables) / float64(words)
 	return 206.835 - 1.015*(wordsPerSentence) - 84.6*syllablesPerWord, nil
+}
+
+// GunningFog returns the readability index according to the Gunning fog index
+func GunningFog(corpus string) (float64, error) {
+	words := NumWords(corpus)
+	complexWords, err := NumComplexWords(corpus)
+	if err != nil {
+		return 0, err
+	}
+	sentences := NumSentences(corpus)
+	wordsPerSentence := float64(words) / float64(sentences)
+	return .4 * (wordsPerSentence + 100*(float64(complexWords)/float64(words))), nil
 }
