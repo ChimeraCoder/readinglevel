@@ -1,0 +1,13 @@
+readinglevel
+===============
+
+ReadingLevel is a Go package for determining the reading level of a passage of text. It currently provides the Flesch–Kincaid Grade Level, the Flesch-Kincaid Reading Ease, the Coleman–Liau index, the Gunning fog index, the SMOG (Simple Measure of Gobbledygook), and the Automated Readabilty Index.
+
+
+
+
+### License
+
+ReadingLevel is free software licensed under the MIT/X11 license. Details provided in the LICENSE file.
+
+
